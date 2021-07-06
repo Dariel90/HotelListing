@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotelListing.Configurations;
 using HotelListing.Data;
+using HotelListing.IRepository;
+using HotelListing.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing
@@ -33,7 +35,7 @@ namespace HotelListing
             {
                 o.UseSqlServer(Configuration.GetConnectionString("SqlConnection"));
             });
-            services.AddControllers();
+            
             services.AddCors(o =>
             {
                 o.AddPolicy("AllowAll", builder =>
@@ -43,9 +45,11 @@ namespace HotelListing
                         .AllowAnyHeader();
                 });
             });
-
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(MapperInitializer));
-
+            services.AddControllers().AddNewtonsoftJson(opt => {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelListing", Version = "v1" });
