@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HotelListing.DTOs;
 using HotelListing.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
 namespace HotelListing.Controllers
@@ -27,8 +28,6 @@ namespace HotelListing.Controllers
         }
 
         [HttpGet]
-        [ProducesErrorResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetHotels()
         {
             try
@@ -45,10 +44,9 @@ namespace HotelListing.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [ProducesErrorResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
         public async Task<IActionResult> GetHotel(int id)
-        {
+        { 
             try
             {
                 var country = await _unitOfWork.Hotels.Get(q => q.Id == id, new List<string>{"Country"});
