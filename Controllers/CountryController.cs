@@ -8,6 +8,7 @@ using AutoMapper;
 using HotelListing.Data;
 using HotelListing.DTOs;
 using HotelListing.IRepository;
+using Microsoft.AspNetCore.Http;
 
 namespace HotelListing.Controllers
 {
@@ -27,6 +28,8 @@ namespace HotelListing.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(statusCode:StatusCodes.Status200OK)]
+        [ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCountries()
         {
             try
@@ -43,6 +46,8 @@ namespace HotelListing.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(statusCode: StatusCodes.Status200OK)]
+        [ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCountry(int id)
         {
             try
