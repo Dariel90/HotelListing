@@ -4,8 +4,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HotelListing.Data;
+using HotelListing.Models;
 using HotelListing.IRepository;
 using Microsoft.EntityFrameworkCore;
+using X.PagedList;
 
 namespace HotelListing.Repository
 {
@@ -29,6 +31,20 @@ namespace HotelListing.Repository
         public void DeleteRange(IEnumerable<T> entities)
         {
             _db.RemoveRange(entities);
+        }
+
+        public async Task<IPagedList<T>> GetAll(RequestParams requestParams, List<string> includes = null)
+        {
+            IQueryable<T> query = _db;
+            
+            if (includes != null)
+            {
+                foreach (var includeProperty in includes)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+            return await query.AsNoTracking().ToPagedListAsync(requestParams.PageNumber, requestParams.PageSize);
         }
 
         public async Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes = null)

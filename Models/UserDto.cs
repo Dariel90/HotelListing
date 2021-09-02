@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace HotelListing.DTOs
+namespace HotelListing.Models
 {
     public class LoginUserDto
     {

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HotelListing.DTOs
+namespace HotelListing.Models
 {
     public class CountryDTO : CreateCountryDTO
     {
