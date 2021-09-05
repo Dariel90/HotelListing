@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotelListing.Data;
-using HotelListing.DTOs;
+using HotelListing.Models;
 using HotelListing.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
