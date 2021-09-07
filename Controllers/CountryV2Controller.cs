@@ -25,6 +25,7 @@ namespace HotelListing.Controllers
             _context = context;
         }
 
+        
         [HttpGet]
         [ProducesResponseType(statusCode: StatusCodes.Status200OK)]
         [ProducesResponseType(statusCode: StatusCodes.Status500InternalServerError)]

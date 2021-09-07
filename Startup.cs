@@ -11,11 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCoreRateLimit;
 using HotelListing.Configurations;
 using HotelListing.Data;
 using HotelListing.IRepository;
 using HotelListing.Repository;
 using HotelListing.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing
@@ -36,6 +38,26 @@ namespace HotelListing
             {
                 o.UseSqlServer(Configuration.GetConnectionString("SqlConnection"));
             });
+
+            //For Rate Limiting and Throttling
+            services.AddMemoryCache();
+            var rateLimitRules = new List<RateLimitRule>()
+            {
+                new RateLimitRule
+                {
+                    Endpoint = "*",
+                    Limit = 1,
+                    Period = "5s"
+                }
+            };
+            services.Configure<IpRateLimitOptions>(opt =>
+            {
+                opt.GeneralRules = rateLimitRules;
+            });
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddInMemoryRateLimiting();
+            //---
+            services.ConfigureHttpCacheHeaders();
 
             services.AddAuthentication();
             services.ConfigureIdentity();
@@ -62,7 +84,13 @@ namespace HotelListing
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelListing", Version = "v1" });
             });
 
-            services.AddControllers().AddNewtonsoftJson(opt => {
+            services.AddControllers(config =>
+            {
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile()
+                {
+                    Duration = 120
+                });
+            }).AddNewtonsoftJson(opt => {
                 opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
@@ -75,15 +103,23 @@ namespace HotelListing
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelListing v1"));
+                
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelListing v1"));
+
             app.ConfigureExceptionHandler();
 
             app.UseHttpsRedirection();
 
             app.UseCors("AllowAll");
 
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
+            app.UseIpRateLimiting();
+
+            
             app.UseRouting();
 
             app.UseAuthentication();
